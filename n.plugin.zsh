@@ -1,3 +1,9 @@
+switch_default() {
+	DEFAULT=${N_DEFAULT-stable}
+	echo "👾 switching to node ${DEFAULT}"
+	n ${DEFAULT} >/dev/null 2>&1
+}
+
 switch_n() {
 	# make sure jq is installed
 	if [ ! "$(command -v jq)" ]; then
@@ -25,11 +31,10 @@ switch_n() {
 				if [ "$current_version" != "$field_version" ]; then
 					if [[ "$node_field" == *$gt* ]]; then
 						# if node field reads greater than, use node stable
-						echo "switching to node stable..."
-						n stable >/dev/null 2>&1
+						switch_default
 					else
 						# otherwise, use the latest release of the specified version
-						echo "switching to node $field_version..."
+						echo "📦 switching to node $field_version found in package.json"
 						n "$field_version" >/dev/null 2>&1
 						# the only error that can be thrown at this point is needing sudo
 						# so we prompt a permissions change
@@ -40,9 +45,7 @@ switch_n() {
 				fi
 			fi
 		else
-			echo "\nengines field not specified in package.json"
-			echo "switching to node stable..."
-			n stable >/dev/null 2>&1
+			switch_default
 		fi
 	fi
 }
